@@ -28,6 +28,7 @@
     /* validated categorical slots — light steps */
     --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
     --s5: #e87ba4; --s6: #008300; --s7: #4a3aa7; --s8: #e34948;
+    --s9: #0f8ea8; /* 9th manager; validated against the other eight */
 
     --good:     #0ca30c;
     --critical: #d03b3b;
@@ -53,6 +54,7 @@
 
       --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
       --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+      --s9: #1b9db5;
 
       --chip-ink-good:     #3ec13e;
       --chip-ink-critical: #e46b6b;
@@ -72,6 +74,7 @@
 
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
     --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+    --s9: #1b9db5;
 
     --chip-ink-good:     #3ec13e;
     --chip-ink-critical: #e46b6b;
@@ -460,7 +463,7 @@
 </div>
 
 <script>
-const SLOTS = ["--s1","--s2","--s3","--s4","--s5","--s6","--s7","--s8"];
+const SLOTS = ["--s1","--s2","--s3","--s4","--s5","--s6","--s7","--s8","--s9"];
 const FIELD_MAX = 80; // the board is ruled to 80 yards, every 20
 const GRIDLINES = [0, 25, 50, 75, 100].map(p => `<i style="left:${p}%"></i>`).join("");
 
@@ -484,6 +487,8 @@ const ROSTER = [
     team: "Atlanta Falcons", game: "ATL @ IND", kickoff: "2026-08-22T17:00Z" },
   { manager: "Taisei", wr: "De'Zhaun Stribling", names: ["De'Zhaun Stribling", "DeZhaun Stribling"],
     team: "San Francisco 49ers", game: "SF @ LAC", kickoff: "2026-08-21T02:00Z" },
+  { manager: "Chris", wr: "KC Concepcion", names: ["KC Concepcion", "K.C. Concepcion"],
+    team: "Cleveland Browns", game: "BUF @ CLE", kickoff: "2026-08-22T17:00Z" },
 ].map(r => ({ ...r, yds: null, rec: null, td: null, lng: null, tgt: null,
               played: false, state: "pre" }));
 

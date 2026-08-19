@@ -25,8 +25,16 @@ should read `Scheduled`, not `Final`.
 | Luke Gailloux | Bryce Lance | New Orleans Saints | NO @ LAR | 2026-08-22 20:00 |
 | Albert | Zach Branch | Atlanta Falcons | ATL @ IND | 2026-08-22 17:00 |
 | Taisei | De'Zhaun Stribling | San Francisco 49ers | SF @ LAC | 2026-08-21 02:00 |
+| Chris | KC Concepcion | Cleveland Browns | BUF @ CLE | 2026-08-22 17:00 |
 
 Three managers (David, Owen, Xuanzhi) have receivers in the same game, NYJ @ PIT.
+
+**Adding a manager:** append to the `ROSTER` array in `index.html` (the server parses
+it from there) and give them the next `--sN` colour. The palette carries nine
+validated slots; a tenth needs a new hue validated with the data-viz skill's
+`validate_palette.js` against the existing nine, in **both** modes — do not eyeball
+it. The first attempt at a ninth colour, a brown, failed on chroma and sat ΔE 5.1
+from slot-8 red under protanopia; teal passed everything.
 
 ## Open question for the league
 **What does an inactive receiver score?** A receiver who doesn't play records no
