@@ -63,6 +63,16 @@ and folds it onto the roster. Flags: `--port`, `--week`.
   embedded in the page.
 - Anyone on the same network can open the machine's LAN address on that port.
 
+## Where it lives
+- **Site:** <https://owenliliu.github.io/wideout-board/> — the league's link.
+- **Repo:** <https://github.com/owenliliu/wideout-board> (public; GitHub Pages on a
+  free account requires it). Pushing to `main` redeploys in about a minute.
+- `index.html` is a **complete HTML document** (doctype, `lang`, viewport, Open Graph
+  tags). Do not strip that wrapper: without it Pages serves the page in quirks mode
+  and phones lay it out at ~980px. Note this differs from what the Claude Artifact
+  wants — the Artifact supplies its own wrapper — so publishing this same file as an
+  Artifact would nest one. The website is now the canonical copy.
+
 ## Deploying it as a real website
 **No server is required to host this.** ESPN's API sends
 `access-control-allow-origin: *`, so the page can call it straight from any viewer's
