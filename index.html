@@ -1,0 +1,766 @@
+<title>The Wideout Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    color-scheme: light;
+
+    --ground:      #f2f3ee;
+    --panel:       #fafbf7;
+    --ink:         #141a17;
+    --ink-2:       #4a5350;
+    --ink-3:       #7c8683;
+    --rule:        #dde0d8;
+    --rule-strong: #c3c8be;
+
+    /* validated categorical slots — light steps */
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+    --s5: #e87ba4; --s6: #008300; --s7: #4a3aa7; --s8: #e34948;
+
+    --good:     #0ca30c;
+    --critical: #d03b3b;
+    --chip-ink-good:     #0a7a0a;
+    --chip-ink-critical: #a82f2f;
+
+    --font-display: "Oswald", "Haettenschweiler", "Arial Narrow", sans-serif;
+    --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+
+      --ground:      #0f1513;
+      --panel:       #161d1a;
+      --ink:         #f2f5f1;
+      --ink-2:       #a8b2ad;
+      --ink-3:       #77817c;
+      --rule:        #232b27;
+      --rule-strong: #333d38;
+
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+      --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+
+      --chip-ink-good:     #3ec13e;
+      --chip-ink-critical: #e46b6b;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --ground:      #0f1513;
+    --panel:       #161d1a;
+    --ink:         #f2f5f1;
+    --ink-2:       #a8b2ad;
+    --ink-3:       #77817c;
+    --rule:        #232b27;
+    --rule-strong: #333d38;
+
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+
+    --chip-ink-good:     #3ec13e;
+    --chip-ink-critical: #e46b6b;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 22px 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  /* ---- masthead ---- */
+  .masthead { display: flex; flex-direction: column; gap: 10px; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(34px, 7vw, 52px);
+    line-height: 0.98;
+    letter-spacing: 0.005em;
+    text-transform: uppercase;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .standfirst {
+    margin: 0;
+    max-width: 60ch;
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+
+  /* ---- control strip ---- */
+  .strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 3px;
+    border: 1px solid var(--rule-strong);
+    color: var(--ink-2);
+  }
+  .chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+  .chip.is-live { color: var(--chip-ink-good); border-color: currentColor; }
+  .strip .grow { flex: 1 1 auto; }
+  .strip .note { font-size: 13px; color: var(--ink-3); }
+
+  button {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 7px 14px;
+    border-radius: 3px;
+    border: 1px solid var(--rule-strong);
+    background: var(--panel);
+    color: var(--ink);
+  }
+  button:hover { border-color: var(--ink-3); }
+  button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  button[aria-pressed="true"] { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+  button:disabled { opacity: 0.45; cursor: default; }
+
+  /* ---- lede ---- */
+  .lede {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .lede .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .lede .who {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(22px, 4vw, 30px);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .lede .why { color: var(--ink-2); font-size: 14px; }
+
+  /* ---- the board ---- */
+  .board { display: flex; flex-direction: column; }
+
+  .slot {
+    display: grid;
+    grid-template-columns: 34px minmax(158px, 1.2fr) minmax(0, 2fr) 62px;
+    align-items: center;
+    gap: 16px;
+    padding: 13px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .slot:last-of-type { border-bottom: 1px solid var(--rule); }
+
+  .pick {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 26px;
+    line-height: 1;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .slot.is-first .pick { color: var(--ink); }
+  .pick.is-tbd { font-size: 18px; color: var(--rule-strong); }
+
+  .who-col { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .manager {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.25;
+  }
+  .swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+  .wr { font-size: 13px; color: var(--ink-2); line-height: 1.3; }
+  .statline {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.01em;
+  }
+
+  /* field-ruled measure */
+  .measure { position: relative; height: 30px; display: flex; align-items: center; }
+  .field { position: absolute; inset: 0; pointer-events: none; }
+  .field i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--rule);
+  }
+  .field i:first-child, .field i:last-child { background: var(--rule-strong); }
+  .bar {
+    position: relative;
+    height: 13px;
+    border-radius: 0 3px 3px 0;
+    min-width: 2px;
+  }
+  /* no line recorded: absence, not a quantity */
+  .no-line {
+    position: relative;
+    width: 100%;
+    border-top: 1px dashed var(--rule-strong);
+  }
+
+  .yards {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 17px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .yards .unit { font-size: 11px; font-weight: 400; color: var(--ink-3); margin-left: 2px; }
+  .yards.is-empty { font-size: 12px; font-weight: 400; color: var(--ink-3); }
+
+  /* axis */
+  .axis {
+    display: grid;
+    grid-template-columns: 34px minmax(158px, 1.2fr) minmax(0, 2fr) 62px;
+    gap: 16px;
+    padding-top: 8px;
+  }
+  .axis .ticks {
+    grid-column: 3;
+    position: relative;
+    height: 14px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+  }
+  .axis .ticks span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+  .axis .ticks span:first-child { transform: none; }
+  .axis .ticks span:last-child { transform: translateX(-100%); }
+
+  /* override row — hidden until "Adjust figures" */
+  .adjust { display: none; grid-column: 2 / -1; align-items: center; gap: 8px; padding-top: 4px; }
+  .board.editing .adjust { display: flex; }
+  .adjust label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .adjust input {
+    width: 68px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 4px 7px;
+    border: 1px solid var(--rule-strong);
+    border-radius: 3px;
+    background: var(--panel);
+    color: var(--ink);
+  }
+  .adjust input:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .adjust .src {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .src.live { color: var(--chip-ink-good); }
+  .src.manual { color: var(--ink); font-weight: 600; }
+  .src.none { color: var(--chip-ink-critical); }
+  .link-btn {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-2);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .link-btn:hover { color: var(--ink); border: none; }
+
+  .ruling {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font-size: 13.5px;
+    color: var(--ink-2);
+    line-height: 1.55;
+  }
+  .ruling .mark {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-top: 3px;
+    flex: none;
+  }
+  .ruling strong { color: var(--ink); font-weight: 600; }
+
+  footer {
+    font-size: 12.5px;
+    color: var(--ink-3);
+    line-height: 1.6;
+    border-top: 1px solid var(--rule);
+    padding-top: 16px;
+  }
+  footer code {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 620px) {
+    .slot, .axis { grid-template-columns: 26px minmax(0, 1fr) auto; gap: 6px 12px; }
+    .slot .pick   { grid-column: 1; grid-row: 1 / span 2; align-self: start; }
+    .slot .who-col{ grid-column: 2; grid-row: 1; }
+    .slot .yards  { grid-column: 3; grid-row: 1; align-self: start; }
+    .slot .measure{ grid-column: 2 / -1; grid-row: 2; height: 24px; }
+    .slot .adjust { grid-column: 2 / -1; grid-row: 3; }
+    .axis .ticks  { grid-column: 2 / -1; }
+    .wrap { padding: 28px 16px 56px; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .bar { transition: width 420ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="eyebrow">2026 Draft Order · Preseason Week <span id="weekNo">3</span></div>
+    <h1>The Wideout Board</h1>
+    <p class="standfirst">
+      Everyone called one wide receiver before the final week of the preseason. Most receiving
+      yards takes the first pick; fewest takes last. Nothing is settled until the games are played —
+      figures below come from the official ESPN box scores as each one goes final.
+    </p>
+  </header>
+
+  <div class="strip">
+    <span id="statusChip" class="chip"><span class="dot"></span><span id="statusText">final</span></span>
+    <span class="note" id="statusNote"></span>
+    <span class="grow"></span>
+    <button id="refreshBtn">Refresh</button>
+    <button id="editBtn" aria-pressed="false">Adjust figures</button>
+  </div>
+
+  <div class="lede">
+    <span class="label" id="ledeLabel">First pick</span>
+    <span class="who" id="ledeWho">—</span>
+    <span class="why" id="ledeWhy"></span>
+  </div>
+
+  <div>
+    <div class="board" id="board"></div>
+    <div class="axis">
+      <div class="ticks">
+        <span style="left:0%">0</span><span style="left:25%">20</span><span style="left:50%">40</span><span style="left:75%">60</span><span style="left:100%">80 yds</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ruling">
+    <span class="mark">Settle first</span>
+    <div>
+      <strong>Agree what an inactive receiver scores before kickoff.</strong> Preseason snaps for
+      young receivers are never guaranteed — Bryce Lance dressed but never appeared in a box score in
+      Week 2. A receiver who doesn't play records no line at all, which is not the same thing as
+      zero yards, and it's a much easier conversation now than on Sunday.
+    </div>
+  </div>
+
+  <footer>
+    Kickoff times show in your own timezone. Receiving lines come from ESPN's public box scores and
+    land once a game goes final. <strong>Adjust figures</strong> lets you enter or correct a number by
+    hand; a manual figure always beats the fetched one and is saved in your browser only, so it won't
+    change what anyone else sees. Rules and roster live in <code>CLAUDE.md</code> alongside the source.
+  </footer>
+</div>
+
+<script>
+const SLOTS = ["--s1","--s2","--s3","--s4","--s5","--s6","--s7","--s8"];
+const FIELD_MAX = 80; // the board is ruled to 80 yards, every 20
+const GRIDLINES = [0, 25, 50, 75, 100].map(p => `<i style="left:${p}%"></i>`).join("");
+
+// The league's picks for preseason week 3 (2026). Games are ahead of us: yards arrive
+// from the ESPN box score once each game goes final, so every row starts empty.
+const WEEK = 3;
+const ROSTER = [
+  { manager: "Matthew Jin", wr: "Caleb Douglas", names: ["Caleb Douglas"],
+    team: "Miami Dolphins", game: "NYG @ MIA", kickoff: "2026-08-22T20:00Z" },
+  { manager: "Matthew Tam", wr: "Ja'Kobi Lane", names: ["Ja'Kobi Lane", "Jakobi Lane"],
+    team: "Baltimore Ravens", game: "BAL @ MIN", kickoff: "2026-08-22T17:00Z" },
+  { manager: "David", wr: "Omar Cooper Jr.", names: ["Omar Cooper Jr.", "Omar Cooper"],
+    team: "New York Jets", game: "NYJ @ PIT", kickoff: "2026-08-21T23:00Z" },
+  { manager: "Owen", wr: "Germie Bernard", names: ["Germie Bernard"],
+    team: "Pittsburgh Steelers", game: "NYJ @ PIT", kickoff: "2026-08-21T23:00Z" },
+  { manager: "Xuanzhi", wr: "Kaden Wetjen", names: ["Kaden Wetjen"],
+    team: "Pittsburgh Steelers", game: "NYJ @ PIT", kickoff: "2026-08-21T23:00Z" },
+  { manager: "Luke Gailloux", wr: "Bryce Lance", names: ["Bryce Lance"],
+    team: "New Orleans Saints", game: "NO @ LAR", kickoff: "2026-08-22T20:00Z" },
+  { manager: "Albert", wr: "Zach Branch", names: ["Zach Branch", "Zachariah Branch"],
+    team: "Atlanta Falcons", game: "ATL @ IND", kickoff: "2026-08-22T17:00Z" },
+  { manager: "Taisei", wr: "De'Zhaun Stribling", names: ["De'Zhaun Stribling", "DeZhaun Stribling"],
+    team: "San Francisco 49ers", game: "SF @ LAC", kickoff: "2026-08-21T02:00Z" },
+].map(r => ({ ...r, yds: null, rec: null, td: null, lng: null, tgt: null,
+              played: false, state: "pre" }));
+
+const LS_OVERRIDES = "wideout-board-overrides-v1";
+
+const readOverrides = () => {
+  try { return JSON.parse(localStorage.getItem(LS_OVERRIDES)) || {}; } catch { return {}; }
+};
+const writeOverrides = (o) => {
+  try { localStorage.setItem(LS_OVERRIDES, JSON.stringify(o)); } catch { /* private mode */ }
+};
+
+const norm = (s) => s.toLowerCase().replace(/['’]/g, "").replace(/\./g, "")
+  .replace(/-/g, " ").replace(/\s+/g, " ").trim();
+
+const colorOf = (manager) =>
+  `var(${SLOTS[ROSTER.findIndex(r => r.manager === manager) % SLOTS.length]})`;
+
+let data = ROSTER.map(r => ({ ...r }));
+let isLive = false;
+let editing = false;
+
+// Three ways to get figures, best first:
+//   1. our own server (/api/board) — one ESPN fetch shared by every open tab
+//   2. ESPN directly — works from a local file, blocked on a hosted page
+//   3. nothing, and the board stays on its embedded schedule
+async function fetchFromServer() {
+  const res = await fetch("api/board", { cache: "no-store" });
+  if (!res.ok) throw new Error(`board endpoint said ${res.status}`);
+  const payload = await res.json();
+  if (!payload.rows || !payload.rows.length) throw new Error("board endpoint sent no rows");
+  const byManager = Object.fromEntries(payload.rows.map(r => [r.manager, r]));
+  return {
+    rows: ROSTER.map(r => ({ ...r, ...(byManager[r.manager] || {}) })),
+    allFinal: payload.allFinal,
+    stale: payload.stale,
+    week: payload.week,
+  };
+}
+
+async function fetchBoxScores() {
+  const host = "https://site.web.api.espn.com/apis/site/v2/sports/football/nfl";
+  const sb = await fetch(`${host}/scoreboard?seasontype=1&week=${WEEK}&dates=2026`,
+    { cache: "no-store" }).then(r => r.json());
+  const events = sb.events || [];
+  if (!events.length) throw new Error("scoreboard returned no games");
+
+  // Only six of the week's sixteen games have a receiver we care about, and a game
+  // that hasn't kicked off has no box score to read — so the scoreboard alone
+  // carries us until kickoff, and we never pull a summary we can't use.
+  const ourTeams = new Set(ROSTER.map(r => r.team));
+  const teamState = {};
+  const needed = [];
+  for (const e of events) {
+    const comp = (e.competitions || [])[0] || {};
+    const sides = comp.competitors || [];
+    const names = sides.map(c => (c.team || {}).displayName).filter(Boolean);
+    if (!names.some(n => ourTeams.has(n))) continue;
+
+    const st = (e.status || {}).type || {};
+    const label = sides.slice().reverse()
+      .map(c => (c.team || {}).abbreviation || "?").join(" @ ");
+    const entry = { state: st.state || "pre", detail: st.shortDetail || "", game: label };
+    for (const n of names) if (ourTeams.has(n)) teamState[n] = entry;
+    if (entry.state !== "pre") needed.push(e.id);
+  }
+
+  const lines = {};
+  const summaries = await Promise.all(needed.map(id =>
+    fetch(`${host}/summary?event=${id}`, { cache: "no-store" })
+      .then(r => r.json()).catch(() => null)));
+
+  for (const g of summaries) {
+    if (!g) continue;
+    for (const side of (g.boxscore || {}).players || []) {
+      const teamName = (side.team || {}).displayName;
+      for (const cat of side.statistics || []) {
+        if (cat.name !== "receiving") continue;
+        for (const a of cat.athletes || []) {
+          const nm = (a.athlete || {}).displayName;
+          if (!nm) continue;
+          const v = a.stats || [];
+          const num = (i) => { const n = parseInt(v[i], 10); return isNaN(n) ? 0 : n; };
+          lines[norm(nm)] = {
+            team: teamName, rec: num(0), yds: num(1),
+            td: num(3), lng: num(4), tgt: num(5),
+          };
+        }
+      }
+    }
+  }
+
+  const rows = ROSTER.map(row => {
+    const ts = teamState[row.team];
+    const base = {
+      ...row,
+      state: ts ? ts.state : "pre",
+      detail: ts ? ts.detail : "",
+      game: (ts && ts.game) || row.game,
+    };
+    for (const cand of row.names) {
+      const hit = lines[norm(cand)];
+      if (hit) return { ...base, ...hit, played: true };
+    }
+    // no line: only meaningful once the game is over
+    return { ...base, yds: null, rec: null, td: null, lng: null, tgt: null, played: false };
+  });
+
+  return { rows, allFinal: rows.every(r => r.state === "post"), stale: false };
+}
+
+function ranked() {
+  const ov = readOverrides();
+  return data.map(row => {
+    const raw = ov[row.manager];
+    const manual = raw !== undefined && raw !== null && raw !== "";
+    const value = manual ? Number(raw) : row.yds;
+    return {
+      ...row,
+      manual,
+      overrideValue: manual ? raw : "",
+      value: (value === null || value === undefined || isNaN(value)) ? null : value,
+      source: manual ? "manual" : (row.played ? "live" : "none"),
+    };
+  }).sort((a, b) => {
+    // decided rows first, by yards; the rest stay in kickoff order
+    if (a.value === null && b.value === null) return a.kickoff.localeCompare(b.kickoff);
+    if (a.value === null) return 1;
+    if (b.value === null) return -1;
+    return b.value - a.value;
+  });
+}
+
+const KICK = (iso) => new Date(iso).toLocaleString([], {
+  weekday: "short", hour: "numeric", minute: "2-digit",
+});
+
+function render() {
+  const rows = ranked();
+  const scale = Math.max(FIELD_MAX, ...rows.map(r => r.value || 0));
+
+  const decided = rows.filter(r => r.value !== null).length;
+
+  document.getElementById("board").innerHTML = rows.map((r, i) => {
+    const empty = r.value === null;
+    const pct = empty ? 0 : Math.max(0.8, (r.value / scale) * 100);
+    // a slot number is only real once a figure decides it
+    const slotNo = empty ? "—" : String(i + 1);
+    const line = r.played
+      ? `${r.rec} rec · ${r.tgt} tgt${r.td ? ` · ${r.td} TD` : ""} · long ${r.lng}`
+      : r.state === "post"
+        ? `${r.game} · final · no catches recorded`
+        : r.state === "in"
+          ? `${r.game} · in progress`
+          : `${r.game} · ${KICK(r.kickoff)}`;
+    return `
+      <div class="slot ${!empty && i === 0 ? "is-first" : ""}">
+        <div class="pick ${empty ? "is-tbd" : ""}">${slotNo}</div>
+        <div class="who-col">
+          <div class="manager"><span class="swatch" style="background:${colorOf(r.manager)}"></span>${r.manager}</div>
+          <div class="wr">${r.wr}<span class="statline"> — ${r.team}</span></div>
+          <div class="statline">${line}</div>
+        </div>
+        <div class="measure">
+          <div class="field" aria-hidden="true">${GRIDLINES}</div>
+          ${empty
+            ? `<div class="no-line"></div>`
+            : `<div class="bar" style="width:${pct}%; background:${colorOf(r.manager)}"></div>`}
+        </div>
+        <div class="yards ${empty ? "is-empty" : ""}">${
+          empty ? (r.state === "post" ? "0" : "—") : `${r.value}<span class="unit">yd</span>`
+        }</div>
+        <div class="adjust">
+          <label for="adj-${i}">Yards</label>
+          <input id="adj-${i}" type="number" inputmode="numeric" min="0"
+                 placeholder="${r.yds === null ? "—" : r.yds}" value="${r.overrideValue}"
+                 data-manager="${r.manager}">
+          <span class="src ${r.source}">${
+            r.source === "manual" ? "manual" : r.played ? "box score" : "not played"
+          }</span>
+          ${r.manual ? `<button type="button" class="link-btn" data-clear="${r.manager}">reset</button>` : ""}
+        </div>
+      </div>`;
+  }).join("");
+
+  const board = document.getElementById("board");
+  board.classList.toggle("editing", editing);
+
+  board.querySelectorAll("input[data-manager]").forEach(input => {
+    input.addEventListener("change", e => {
+      const ov = readOverrides();
+      const v = e.target.value;
+      if (v === "") delete ov[e.target.dataset.manager];
+      else ov[e.target.dataset.manager] = Number(v);
+      writeOverrides(ov);
+      render();
+    });
+  });
+  board.querySelectorAll("button[data-clear]").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const ov = readOverrides();
+      delete ov[e.target.dataset.clear];
+      writeOverrides(ov);
+      render();
+    });
+  });
+
+  const lead = rows[0];
+  const label = document.getElementById("ledeLabel");
+  const who = document.getElementById("ledeWho");
+  const why = document.getElementById("ledeWhy");
+  const waiting = rows.filter(r => r.state !== "post" && !r.manual).length;
+  if (decided === 0) {
+    label.textContent = "First pick";
+    who.textContent = "Undecided";
+    const gameCount = new Set(rows.map(r => r.game)).size;
+    why.textContent = `${rows.length} receivers across ${gameCount} games · first kickoff ${KICK(
+      rows.map(r => r.kickoff).sort()[0])}`;
+  } else {
+    label.textContent = waiting === 0 ? "First pick" : "Leading";
+    who.textContent = lead.manager;
+    why.textContent = `${lead.wr}, ${lead.value} yards` +
+      (waiting > 0 ? ` · ${waiting} still to play` : "");
+  }
+
+  document.getElementById("weekNo").textContent = boardWeek;
+  const chip = document.getElementById("statusChip");
+  const auto = source === "server" && !allFinal;
+  chip.classList.toggle("is-live", auto);
+  const played = rows.length - waiting;
+  document.getElementById("statusText").textContent =
+    waiting === 0 && played > 0 ? "final"
+    : played > 0 ? `${played} of ${rows.length} in`
+    : auto ? "live · games ahead"
+    : "games ahead";
+}
+
+const POLL_MS = 45000;
+let boardWeek = WEEK;
+let source = null;      // "server" | "espn" | null
+let allFinal = false;
+let pollTimer = null;
+
+async function loadBoard() {
+  // try our server first, then ESPN directly; remember which one worked
+  if (source !== "espn") {
+    try {
+      const r = await fetchFromServer();
+      source = "server";
+      if (r.week) boardWeek = r.week;
+      return r;
+    } catch (err) {
+      if (source === "server") throw err;   // it worked before; report the blip
+    }
+  }
+  const r = await fetchBoxScores();
+  source = "espn";
+  return r;
+}
+
+function scheduleNextPoll() {
+  clearTimeout(pollTimer);
+  // once every game is final there is nothing left to learn
+  if (!source || allFinal) return;
+  pollTimer = setTimeout(refresh, POLL_MS);
+}
+
+async function refresh(opts = {}) {
+  const btn = document.getElementById("refreshBtn");
+  const note = document.getElementById("statusNote");
+  if (btn) { btn.disabled = true; btn.textContent = "Checking…"; }
+  try {
+    const result = await loadBoard();
+    data = result.rows;
+    allFinal = !!result.allFinal;
+    const at = new Date().toLocaleTimeString();
+    note.textContent = result.stale
+      ? `ESPN unreachable — showing last good figures from ${at}`
+      : source === "server"
+        ? (allFinal ? `Final · checked ${at}` : `Updating automatically · checked ${at}`)
+        : `Checked ${at}`;
+  } catch (err) {
+    if (source) {
+      note.textContent = `Couldn't reach the board just now — retrying. (${err.message})`;
+    } else {
+      // never had a source: this is the hosted view, where outside hosts are blocked
+      if (btn) btn.remove();
+      note.textContent = "Shared view can't reach ESPN — ask Owen to refresh the board after kickoff.";
+    }
+  } finally {
+    if (btn && document.contains(btn)) { btn.disabled = false; btn.textContent = "Refresh"; }
+    render();
+    scheduleNextPoll();
+  }
+}
+
+// stop polling while the tab is hidden; catch up as soon as it is looked at again
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) clearTimeout(pollTimer);
+  else if (source && !allFinal) refresh();
+});
+
+document.getElementById("editBtn").addEventListener("click", e => {
+  editing = !editing;
+  e.currentTarget.setAttribute("aria-pressed", String(editing));
+  e.currentTarget.textContent = editing ? "Done" : "Adjust figures";
+  render();
+});
+document.getElementById("refreshBtn").addEventListener("click", refresh);
+
+render();
+refresh();
+</script>
