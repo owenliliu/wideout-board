@@ -333,6 +333,26 @@
   }
   .link-btn:hover { color: var(--ink); border: none; }
 
+  .adj-flag {
+    display: inline-block;
+    margin-left: 6px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--chip-ink-critical);
+    vertical-align: 1px;
+  }
+  .warn {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--chip-ink-critical);
+    border-left: 2px solid var(--chip-ink-critical);
+    padding-left: 10px;
+  }
   .ruling {
     display: flex;
     gap: 12px;
@@ -402,8 +422,9 @@
     <span class="note" id="statusNote"></span>
     <span class="grow"></span>
     <button id="refreshBtn">Refresh</button>
-    <button id="editBtn" aria-pressed="false">Adjust figures</button>
+    <button id="editBtn" aria-pressed="false" hidden>Adjust figures</button>
   </div>
+  <p id="adjWarning" class="warn" hidden></p>
 
   <div class="lede">
     <span class="label" id="ledeLabel">First pick</span>
@@ -632,9 +653,9 @@ function render() {
             ? `<div class="no-line"></div>`
             : `<div class="bar" style="width:${pct}%; background:${colorOf(r.manager)}"></div>`}
         </div>
-        <div class="yards ${empty ? "is-empty" : ""}">${
+        <div class="yards ${empty ? "is-empty" : ""} ${r.manual ? "is-manual" : ""}">${
           empty ? (r.state === "post" ? "0" : "—") : `${r.value}<span class="unit">yd</span>`
-        }</div>
+        }${r.manual ? `<span class="adj-flag" title="Entered by hand — not the ESPN box score">adjusted</span>` : ""}</div>
         <div class="adjust">
           <label for="adj-${i}">Yards</label>
           <input id="adj-${i}" type="number" inputmode="numeric" min="0"
@@ -689,6 +710,13 @@ function render() {
   }
 
   document.getElementById("weekNo").textContent = boardWeek;
+  // if any figure was typed in, say so loudly — a screenshot should never pass as official
+  const edited = rows.filter(r => r.manual).map(r => r.manager);
+  const warn = document.getElementById("adjWarning");
+  warn.hidden = edited.length === 0;
+  if (edited.length) {
+    warn.textContent = `Showing adjusted figures for ${edited.join(", ")} — not the ESPN box score.`;
+  }
   const chip = document.getElementById("statusChip");
   const auto = source === "server" && !allFinal;
   chip.classList.toggle("is-live", auto);
@@ -765,7 +793,14 @@ document.addEventListener("visibilitychange", () => {
   else if (source && !allFinal) refresh();
 });
 
-document.getElementById("editBtn").addEventListener("click", e => {
+// The board is public, so the by-hand entry is not on display for everyone: it is
+// an escape hatch for whoever is running the league (open the page with ?adjust=1)
+// if a receiver's name stops matching mid-game. It only ever changes the reader's
+// own browser, and anything typed in is flagged on the board and in the banner.
+const editBtn = document.getElementById("editBtn");
+if (new URLSearchParams(location.search).has("adjust")) editBtn.hidden = false;
+
+editBtn.addEventListener("click", e => {
   editing = !editing;
   e.currentTarget.setAttribute("aria-pressed", String(editing));
   e.currentTarget.textContent = editing ? "Done" : "Adjust figures";
