@@ -28,7 +28,8 @@
     /* validated categorical slots — light steps */
     --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
     --s5: #e87ba4; --s6: #008300; --s7: #4a3aa7; --s8: #e34948;
-    --s9: #0f8ea8; /* 9th manager; validated against the other eight */
+    --s9: #0f8ea8; /* 9th and 10th managers; both validated against the set */
+    --s10: #b0447f;
 
     --good:     #0ca30c;
     --critical: #d03b3b;
@@ -55,6 +56,7 @@
       --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
       --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
       --s9: #1b9db5;
+      --s10: #b0447f;
 
       --chip-ink-good:     #3ec13e;
       --chip-ink-critical: #e46b6b;
@@ -75,6 +77,7 @@
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
     --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
     --s9: #1b9db5;
+    --s10: #b0447f;
 
     --chip-ink-good:     #3ec13e;
     --chip-ink-critical: #e46b6b;
@@ -445,12 +448,22 @@
   </div>
 
   <div class="ruling">
-    <span class="mark">Settle first</span>
+    <span class="mark">House rules</span>
     <div>
-      <strong>Agree what an inactive receiver scores before kickoff.</strong> Preseason snaps for
-      young receivers are never guaranteed — Bryce Lance dressed but never appeared in a box score in
-      Week 2. A receiver who doesn't play records no line at all, which is not the same thing as
-      zero yards, and it's a much easier conversation now than on Sunday.
+      <p><strong>A receiver who doesn't play scores 0.</strong> No line in the box score is a zero,
+      not an exemption — once his game is final the board ranks him on it like anyone else.</p>
+
+      <p>If two managers finish level on receiving yards, work down this list until it breaks:</p>
+      <ol class="tiebreaks">
+        <li><strong>PPR points</strong> — catches and touchdowns count here, so a shorter but busier
+          afternoon can still take it</li>
+        <li><strong>Longest reception</strong></li>
+        <li><strong>Points scored by his offense</strong></li>
+        <li><strong>Total offense yards</strong></li>
+      </ol>
+
+      <p class="rules-note">The board ranks on receiving yards alone and won't apply these itself —
+      if two managers land on the same number, settle it from the box scores.</p>
     </div>
   </div>
 
@@ -463,7 +476,7 @@
 </div>
 
 <script>
-const SLOTS = ["--s1","--s2","--s3","--s4","--s5","--s6","--s7","--s8","--s9"];
+const SLOTS = ["--s1","--s2","--s3","--s4","--s5","--s6","--s7","--s8","--s9","--s10"];
 const FIELD_MAX = 80; // the board is ruled to 80 yards, every 20
 const GRIDLINES = [0, 25, 50, 75, 100].map(p => `<i style="left:${p}%"></i>`).join("");
 
@@ -489,6 +502,8 @@ const ROSTER = [
     team: "San Francisco 49ers", game: "SF @ LAC", kickoff: "2026-08-21T02:00Z" },
   { manager: "Chris", wr: "KC Concepcion", names: ["KC Concepcion", "K.C. Concepcion"],
     team: "Cleveland Browns", game: "BUF @ CLE", kickoff: "2026-08-22T17:00Z" },
+  { manager: "Alexandre", wr: "Malachi Fields", names: ["Malachi Fields"],
+    team: "New York Giants", game: "NYG @ MIA", kickoff: "2026-08-22T20:00Z" },
 ].map(r => ({ ...r, yds: null, rec: null, td: null, lng: null, tgt: null,
               played: false, state: "pre" }));
 
@@ -605,7 +620,10 @@ function ranked() {
   return data.map(row => {
     const raw = ov[row.manager];
     const manual = raw !== undefined && raw !== null && raw !== "";
-    const value = manual ? Number(raw) : row.yds;
+    let value = manual ? Number(raw) : row.yds;
+    // House rule: a receiver who didn't play scores 0 — but only once his game is
+    // final. Before kickoff there is still no figure, which is a different thing.
+    if (!manual && value === null && row.state === "post") value = 0;
     return {
       ...row,
       manual,
@@ -640,7 +658,7 @@ function render() {
     const line = r.played
       ? `${r.rec} rec · ${r.tgt} tgt${r.td ? ` · ${r.td} TD` : ""} · long ${r.lng}`
       : r.state === "post"
-        ? `${r.game} · final · no catches recorded`
+        ? `${r.game} · final · did not play, 0 by house rule`
         : r.state === "in"
           ? `${r.game} · in progress`
           : `${r.game} · ${KICK(r.kickoff)}`;

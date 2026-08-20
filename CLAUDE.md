@@ -26,20 +26,26 @@ should read `Scheduled`, not `Final`.
 | Albert | Zach Branch | Atlanta Falcons | ATL @ IND | 2026-08-22 17:00 |
 | Taisei | De'Zhaun Stribling | San Francisco 49ers | SF @ LAC | 2026-08-21 02:00 |
 | Chris | KC Concepcion | Cleveland Browns | BUF @ CLE | 2026-08-22 17:00 |
+| Alexandre | Malachi Fields | New York Giants | NYG @ MIA | 2026-08-22 20:00 |
 
-Three managers (David, Owen, Xuanzhi) have receivers in the same game, NYJ @ PIT.
+Ten managers. David, Owen and Xuanzhi share NYJ @ PIT; Matthew Jin and Alexandre are
+head-to-head in NYG @ MIA.
 
 **Adding a manager:** append to the `ROSTER` array in `index.html` (the server parses
-it from there) and give them the next `--sN` colour. The palette carries nine
-validated slots; a tenth needs a new hue validated with the data-viz skill's
+it from there) and give them the next `--sN` colour. The palette carries ten
+validated slots; an eleventh needs a new hue validated with the data-viz skill's
 `validate_palette.js` against the existing nine, in **both** modes — do not eyeball
 it. The first attempt at a ninth colour, a brown, failed on chroma and sat ΔE 5.1
 from slot-8 red under protanopia; teal passed everything.
 
-## Open question for the league
-**What does an inactive receiver score?** A receiver who doesn't play records no
-line at all, which is not the same as zero yards. Bryce Lance dressed but never
-appeared in a Week 2 box score, so this is a live risk. Settle it before kickoff.
+## House rules (settled)
+- **An inactive receiver scores 0.** No line in a *final* box score is a zero and is
+  ranked as one. Before kickoff there is still no figure — the code keeps those
+  distinct: the zero is only applied once the game's state is `post`.
+- **Tie-breaks**, in order: PPR points → longest reception → points scored by his
+  offense → total offense yards. These are **not implemented**; the board ranks on
+  receiving yards alone and the league settles ties by hand from the box scores.
+  They are printed at the foot of the page for reference.
 
 ## Requirements
 - Single-file HTML dashboard (`index.html`) — no build step, no server. Opens by
